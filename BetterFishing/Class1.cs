@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace BetterFishing
 {
-    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.0.1")]
+    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.2.0")]
     [BepInProcess("valheim.exe")]
     public class BetterFishing : BaseUnityPlugin
     {
