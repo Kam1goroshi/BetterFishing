@@ -62,5 +62,8 @@
   <ItemGroup>
     <None Include="manifest.json" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="LICENCE" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
