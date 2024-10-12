@@ -4,6 +4,13 @@ using UnityEngine;
 using BepInEx.Configuration;
 using System.Collections.Generic;
 
+/*
+ * BetterFishing - A mod for Valheim
+ * 
+ * Copyright (c) 2024 Kam1goroshi
+ * Licensed under the MIT License.
+ * See the LICENSE file for details in https://github.com/Kam1goroshi/BetterFishing
+ */
 namespace BetterFishing
 {
     [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.2.0")]
