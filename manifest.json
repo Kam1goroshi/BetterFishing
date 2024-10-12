@@ -1,6 +1,7 @@
 ﻿{
     "name": "BetterFishing",
     "version_number": "0.2.2",
+    "author": "Kam1goroshi",
     "website_url": "https://github.com/Kam1goroshi/BetterFishing",
     "description": "A Mod aiming to improve fishing experience in Valheim.",
     "dependencies": []
