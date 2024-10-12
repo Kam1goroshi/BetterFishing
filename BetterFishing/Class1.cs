@@ -13,7 +13,7 @@ using System.Collections.Generic;
  */
 namespace BetterFishing
 {
-    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.2.0")]
+    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.2.1")]
     [BepInProcess("valheim.exe")]
     public class BetterFishing : BaseUnityPlugin
     {
@@ -85,6 +85,9 @@ namespace BetterFishing
         [HarmonyPatch(typeof(FishingFloat), "Awake")]
         class FishingFixedUpdatePatch
         {
+            /*
+             * When fishingFloat is initialized change the default multiplier
+             */
             static void Postfix(ref float ___m_fishingSkillImproveHookedMultiplier)
             {
                 ___m_fishingSkillImproveHookedMultiplier = hookExpMultiplier.Value;
@@ -99,6 +102,7 @@ namespace BetterFishing
         {
             static void Prefix(Fish fish, Character owner)
             {
+                //Next 2 lines follow the same logic asa the original version just in case.
                 ItemDrop itemDrop = fish ? fish.gameObject.GetComponent<ItemDrop>() : null;
                 if ((bool)fish)
                 {
@@ -115,18 +119,17 @@ namespace BetterFishing
 
         /**
          * @dev This runs when you press *E* to pickup a fish. Devs have a different logic for catching a fish because the line is < 0.5 \n
-         * Could even be bad approach since it CAN but doesn't always get used from catch.
+         * Could even be bad approach since it probably can but be used from catch() so duplicate exp call. Unsure about this from dissasemblying
          */
         [HarmonyPatch(typeof(Fish), nameof(Fish.Pickup))]
         class FishPickupPatch
         {
             static void Prefix(Fish __instance)
             {
-                //FieldInfo itemDropField = typeof(Fish).GetField("m_itemDrop", BindingFlags.NonPublic | BindingFlags.Instance);
                 ItemDrop item = __instance.GetComponent<ItemDrop>();
                 if (item != null)
                 {
-                    if (__instance.IsHooked())
+                    if (__instance.IsHooked()) //Interract with fish by pressing "E", check that it's actually on rod and not from floor.
                     {
                         string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
                         float exp = getExpGainOnCatch(item.m_itemData.m_quality, baitPrefabName);
