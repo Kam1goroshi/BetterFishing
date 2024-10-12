@@ -55,7 +55,14 @@ namespace BetterFishing
             baitBonusExpMap.Add("FishingBaitMistlands", fishingBaitMistlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitAshlands", fishingBaitAshlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitDeepNorth", fishingBaitDeepNorthBonus.Value);
-        harmony.PatchAll();
+
+            #if DEBUG
+            foreach(var bait in baitBonusExpMap)
+            {
+                Debug.Log($"Added <key:{bait.Key},value:{bait.Value} in baitBonusExpMap");
+            }
+            #endif
+            harmony.PatchAll();
         }
 
         void OnDestroy()
@@ -73,7 +80,12 @@ namespace BetterFishing
             accumulator *= (1f + (bonusPerFishLevel.Value * (quality - 1f)));
             if(baitBonusExpMap.TryGetValue(baitPrefabName, out float baitBonus))
             {
-                return accumulator * (baitBonus + 1.0f);
+                accumulator *= (baitBonus + 1.0f);
+                #if DEBUG
+                Debug.Log($"Calculated exp gain: {accumulator}");
+                #endif
+                return accumulator;
+
             }
             else
             {
