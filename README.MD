@@ -38,7 +38,7 @@ After the mod is installed, launch it with mods atleast once to generate its con
 
 ## Download
 
-You can download the latest version of this mod on [github](https://github.com/Kam1goroshi/BetterFishing/releases) or in [thunderstore](https://thunderstore.io/package/Kam1goroshi/)
+You can download the latest version of this mod on [github](https://github.com/Kam1goroshi/BetterFishing/releases) or in [thunderstore](https://thunderstore.io/c/valheim/p/Kam1goroshi/BetterFishing/)
 
 
 ## Roadmap
