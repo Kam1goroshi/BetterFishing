@@ -55,10 +55,6 @@ namespace BetterFishing
             baitBonusExpMap.Add("FishingBaitMistlands", fishingBaitMistlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitAshlands", fishingBaitAshlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitDeepNorth", fishingBaitDeepNorthBonus.Value);
-            foreach(var bait in baitBonusExpMap)
-            {
-                Debug.Log($"key:{bait.Key}, value:{bait.Value}");
-            }
         harmony.PatchAll();
         }
 
@@ -75,12 +71,11 @@ namespace BetterFishing
             accumulator *= (1f + (bonusPerFishLevel.Value * (quality - 1f)));
             if(baitBonusExpMap.TryGetValue(fishPrefabName, out float baitBonus))
             {
-                Debug.Log($"accumulator: {accumulator}, bait bonus: {baitBonus}, result: {accumulator * (baitBonus + 1):F2}");
                 return accumulator * (baitBonus + 1.0f);
             }
             else
             {
-                Debug.Log("Didn't find a value for fishPrefabName in bait bonus exp map");
+                Debug.LogError("Key wasn't found in bait bonus map.");
                 return accumulator;
             }
         }
@@ -106,14 +101,12 @@ namespace BetterFishing
                 if ((bool)fish)
                 {
                     string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
-                    Debug.Log($"fish level = {itemDrop.m_itemData.m_quality} with bait <{baitPrefabName}>");
                     float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
-                    Debug.Log($"Gained {exp} exp for fishing skill");
                     Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
                 }
                 else
                 {
-                    Debug.Log("itemDrop postfix catch was null");
+                    Debug.LogError("null fish in FishCatchPatch");
                 }
             }
         }
@@ -134,14 +127,12 @@ namespace BetterFishing
                     if (__instance.IsHooked())
                     {
                         string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
-                        Debug.Log($"fish level = {item.m_itemData.m_quality} with bait <{baitPrefabName}>");
                         float exp = getExpGainOnCatch(item.m_itemData.m_quality, baitPrefabName);
-                        Debug.Log($"Gained {exp} exp for fishing skill");
                         Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
                     }
                 }
                 else
-                    Debug.Log("in FishPickupPatch the item was null");
+                    Debug.LogError("null fish in FishPickupPatch");
             }
         }
     }
