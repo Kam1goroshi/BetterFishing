@@ -62,14 +62,16 @@ namespace BetterFishing
         {
             harmony.UnpatchSelf();
         }
+
         /**
          *  @param quality is item stars + 1 (item.quality in dissasembly)
+         *  @param baitPrefabName the name of the bait in order to find its bonus from the map 
          */
-        private static float getExpGainOnCatch(float quality, string fishPrefabName)
+        private static float getExpGainOnCatch(float quality, string baitPrefabName)
         {
             float accumulator = stepsForCatch.Value;
             accumulator *= (1f + (bonusPerFishLevel.Value * (quality - 1f)));
-            if(baitBonusExpMap.TryGetValue(fishPrefabName, out float baitBonus))
+            if(baitBonusExpMap.TryGetValue(baitPrefabName, out float baitBonus))
             {
                 return accumulator * (baitBonus + 1.0f);
             }
