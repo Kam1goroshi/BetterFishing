@@ -159,29 +159,5 @@ namespace BetterFishing
                     logger.LogError("null fish in FishPickupPatch");
             }
         }
-
-        [HarmonyPatch(typeof(Fish), nameof(Fish.Awake))]
-        class FishLevelUpPatch
-        {
-            static void Postfix(Fish fish)
-            {
-                ItemDrop itemDrop = fish.GetComponent<ItemDrop>();
-                if (itemDrop != null)
-                {
-                    if (fish.IsHooked()) //Interract with fish by pressing "E", check that it's actually on rod and not from floor.
-                    {
-                        // Debug lines
-                        logger.LogDebug("ItemDrop: " + (itemDrop != null ? itemDrop.name : "---"));
-                        logger.LogDebug("Pickup item: " + (fish.m_pickupItem != null ? fish.m_pickupItem.name : "---"));
-                        //end debug
-                        string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
-                        float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
-                        Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
-                    }
-                }
-                else
-                    logger.LogError("null fish in FishPickupPatch");
-            }
-        }
     }
 }
