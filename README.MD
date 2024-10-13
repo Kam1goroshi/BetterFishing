@@ -1,4 +1,5 @@
 
+
 <h1 align="center">
   <br>
   <br>
@@ -20,13 +21,14 @@
 
 ## Key Features
 
-In Valheim you earn exp everytime you reel, regardless of how difficult it was.<br>
+In Valheim you earn exp everytime you reel, regardless of how difficult it was.
 This mod lets you farm exp while focusing on catching high quality fish instead
 
  
 * Modifiable exp multipliers
 * Exp multiplier from bait type used
 * Exp multiplier from fish grade
+* Possibility to boost the grade of a fish while hooking it (once)
 
 With this mod, you can improve your fishing skill faster by catching better fish. Additionally you could make "training ponds", where you can throw your fish and refish them to become a better fisher.
 ## How To Use
@@ -42,10 +44,11 @@ You can download the latest version of this mod on [github](https://github.com/K
 
 
 ## Roadmap
-
-I am not sure if I will continue this project. But some ideas I have:
-- Fishing Bags to store your baits
+I am not sure if I will continue this project further. But some ideas I have:
+- Extra items like fishing bag, rod, and others
 - Disable exp from reeling without a fish hooked
+- De-level a boosted fish if the catch failed
+- Synced configurations
 
 Merges are welcome if someone wants to implement something
 
@@ -71,6 +74,4 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 ---
 
-> [GitHub](https://github.com/amitmerchant1990) &nbsp;&middot;&nbsp;
-> [Discord](https://discordapp.com/users/455756322655174659)&nbsp;&middot;&nbsp;
-> [Youtube](https://www.youtube.com/@Kam1goroshi)
+> [GitHub](https://github.com/amitmerchant1990) &nbsp;&middot;&nbsp;> [Discord](https://discordapp.com/users/455756322655174659)&nbsp;&middot;&nbsp;> [Youtube](https://www.youtube.com/@Kam1goroshi)

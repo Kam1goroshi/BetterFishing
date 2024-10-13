@@ -14,10 +14,12 @@ using BepInEx.Logging;
  */
 namespace BetterFishing
 {
-    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.2.4")]
+    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "1.0.0")]
     [BepInProcess("valheim.exe")]
     public class BetterFishing : BaseUnityPlugin
     {
+        private static readonly int maxFishLevel = 5; //might be useful in the future
+        private static readonly int minFishLevel = 0; //might be useful in the future
         private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BetterFishing");
         private readonly Harmony harmony = new Harmony("kam1goroshi.BetterFishing");
         private static Dictionary<string, float> baitBonusExpMap = new Dictionary<string, float>();
@@ -33,7 +35,8 @@ namespace BetterFishing
         private static ConfigEntry<float> fishingBaitAshlandsBonus;
         private static ConfigEntry<float> fishingBaitDeepNorthBonus;
         private static ConfigEntry<float> fishingBaitMistlandsBonus;
-
+        private static ConfigEntry<int> fishingBoosterStartLevel;
+        private static ConfigEntry<float> fishingBoosterMaxChance;
         void Awake()
         {
             hookExpMultiplier = Config.Bind<float>("General", "Hook_Exp_Multiplier", 2.0f, new ConfigDescription("Reeling exp with a hooked fish compared to vanilla empty reel. Vanilla/Default: 2x", new AcceptableValueRange<float>(0.0f, 5.0f)));
@@ -48,6 +51,8 @@ namespace BetterFishing
             fishingBaitMistlandsBonus = Config.Bind<float>("Fish type bonus", "Misty_Fishing_Bait_bonus", 0.75f, new ConfigDescription("Bonus exp multiplier for using mistlands bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
             fishingBaitAshlandsBonus = Config.Bind<float>("Fish type bonus", "Hot_Fishing_Bait_bonus", 1.0f, new ConfigDescription("Bonus exp multiplier for using ashlands bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
             fishingBaitDeepNorthBonus = Config.Bind<float>("Fish type bonus", "Frosty_Fishing_Bait_bonus", 1.3f, new ConfigDescription("Bonus exp multiplier for using deep north bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
+            fishingBoosterStartLevel = Config.Bind<int>("Fish Level Booster", "Boosting_Starting_Level", 20, new ConfigDescription("At what level you can increase the level of fish by hooking them", new AcceptableValueRange<int>(0, 100)));
+            fishingBoosterMaxChance = Config.Bind<float>("Fish Level Booster", "Max_Boosting_Chance", 1.0f, new ConfigDescription("What is the max chance? You chances increase linearly as you level until max. 0 to turn off", new AcceptableValueRange<float>(0.0f, 1.0f)));
             baitBonusExpMap.Add("FishingBait", fishingBaitBonus.Value);
             baitBonusExpMap.Add("FishingBaitForest", fishingBaitForestBonus.Value);
             baitBonusExpMap.Add("FishingBaitSwamp", fishingBaitSwampBonus.Value);
@@ -92,6 +97,9 @@ namespace BetterFishing
             }
         }
 
+        /**
+         *  Patch that initializes things in Fishing Awake 
+         */
         [HarmonyPatch(typeof(FishingFloat), "Awake")]
         class FishingFixedUpdatePatch
         {
@@ -101,6 +109,46 @@ namespace BetterFishing
             static void Postfix(ref float ___m_fishingSkillImproveHookedMultiplier)
             {
                 ___m_fishingSkillImproveHookedMultiplier = hookExpMultiplier.Value;
+            }
+        }
+
+       /**
+        * 
+       */
+        [HarmonyPatch(typeof(Fish), nameof(Fish.OnHooked))]
+        class fishLevelBoostPatch
+        {
+            static void Postfix(Fish __instance, FishingFloat ff)
+            {
+                if (ff != null && __instance.m_itemDrop != null && __instance.m_itemDrop.m_itemData != null)
+                {
+                    float fishingLevel = Player.m_localPlayer.GetSkillLevel(Skills.SkillType.Fishing);
+                    //Check that the fish is not boosted and that fishing skill is strong enough to boost fish levels
+                    if (fishingLevel >= fishingBoosterStartLevel.Value &&
+                            __instance.m_itemDrop.m_itemData.m_customData.ContainsKey("BoostedByFishingLevel") == false)
+                    {
+                        //Calculate chance by projecting skill leveling progress on max chance
+                        float progress = fishingLevel / 100.0f; //max level is 100 so no need to clamp for now
+                        float successRate = fishingBoosterMaxChance.Value * progress;
+                        
+                        //Run RNG, on success attempt to level up fish
+                        int counter = 0; //using counter due to multiple rolls consideration in the future
+                        float rng = UnityEngine.Random.Range(0.0f, 1.0f);
+                        logger.LogMessage($"Boosting success rate: {successRate:F2}% and rolled {rng:F2}%");
+                        if (successRate > rng)
+                        {
+                            //run rng before this
+                            __instance.m_itemDrop.SetQuality(Mathf.Clamp(__instance.m_itemDrop.m_itemData.m_quality + 1, minFishLevel, maxFishLevel));
+                            __instance.m_itemDrop.Save();
+                            counter++;
+                        }
+                        if (counter > 0)
+                        {
+                            ff.GetOwner().Message(MessageHud.MessageType.Center, $"Fish Level raised by {counter}!");
+                            __instance.m_itemDrop.m_itemData.m_customData.Add("BoostedByFishingLevel", $"{counter}");
+                        }
+                    }
+                }
             }
         }
 
@@ -117,10 +165,11 @@ namespace BetterFishing
                 if (fish != null)
                 {
                     ItemDrop itemDrop = fish.gameObject.GetComponent<ItemDrop>() ;
-                    // Debug lines
+                    
+                    #if DEBUG
                     logger.LogDebug("ItemDrop: " + (itemDrop != null ? itemDrop.name : "---"));
                     logger.LogDebug("Pickup item: " + (fish.m_pickupItem != null ? fish.m_pickupItem.name : "---"));
-                    //end debug
+                    #endif
                     string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
                     float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
                     Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
@@ -134,22 +183,21 @@ namespace BetterFishing
 
         /**
          * @dev This runs when you press *E* to pickup a fish. Devs have a different logic for catching a fish because the line is < 0.5 \n
-         * Could even be bad approach since it probably can but be used from catch() so duplicate exp call. Unsure about this from dissasemblying
          */
         [HarmonyPatch(typeof(Fish), nameof(Fish.Pickup))]
         class FishPickupPatch
         {
-            static void Prefix(Fish fish)
+            static void Prefix(Fish __instance)
             {
-                ItemDrop itemDrop = fish.GetComponent<ItemDrop>();
+                ItemDrop itemDrop = __instance.GetComponent<ItemDrop>();
                 if (itemDrop != null)
                 {
-                    if (fish.IsHooked()) //Interract with fish by pressing "E", check that it's actually on rod and not from floor.
+                    if (__instance.IsHooked()) //Interract with fish by pressing "E", check that it's actually on rod and not from floor.
                     {
-                        // Debug lines
+                        #if DEBUG
                         logger.LogDebug("ItemDrop: " + (itemDrop != null ? itemDrop.name : "---"));
-                        logger.LogDebug("Pickup item: " + (fish.m_pickupItem != null ? fish.m_pickupItem.name : "---"));
-                        //end debug
+                        logger.LogDebug("Pickup item: " + (__instance.m_pickupItem != null ? __instance.m_pickupItem.name : "---"));
+                        #endif
                         string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
                         float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
                         Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
