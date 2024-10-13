@@ -3,6 +3,7 @@ using HarmonyLib;
 using UnityEngine;
 using BepInEx.Configuration;
 using System.Collections.Generic;
+using BepInEx.Logging;
 
 /*
  * BetterFishing - A mod for Valheim
@@ -13,10 +14,11 @@ using System.Collections.Generic;
  */
 namespace BetterFishing
 {
-    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.2.3")]
+    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "0.2.4")]
     [BepInProcess("valheim.exe")]
     public class BetterFishing : BaseUnityPlugin
     {
+        private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BetterFishing");
         private readonly Harmony harmony = new Harmony("kam1goroshi.BetterFishing");
         private static Dictionary<string, float> baitBonusExpMap = new Dictionary<string, float>();
         private static ConfigEntry<float> hookExpMultiplier;
@@ -56,12 +58,10 @@ namespace BetterFishing
             baitBonusExpMap.Add("FishingBaitAshlands", fishingBaitAshlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitDeepNorth", fishingBaitDeepNorthBonus.Value);
 
-            #if DEBUG
             foreach(var bait in baitBonusExpMap)
             {
-                Debug.Log($"Added <key:{bait.Key},value:{bait.Value} in baitBonusExpMap");
+                logger.LogDebug($"Added <key:{bait.Key},value:{bait.Value} in baitBonusExpMap");
             }
-            #endif
             harmony.PatchAll();
         }
 
@@ -81,15 +81,13 @@ namespace BetterFishing
             if(baitBonusExpMap.TryGetValue(baitPrefabName, out float baitBonus))
             {
                 accumulator *= (baitBonus + 1.0f);
-                #if DEBUG
-                Debug.Log($"Calculated exp gain: {accumulator}");
-                #endif
+                logger.LogMessage($"Skill raised by {accumulator}");
                 return accumulator;
 
             }
             else
             {
-                Debug.LogError("Key wasn't found in bait bonus map.");
+                logger.LogError("Key wasn't found in bait bonus map.");
                 return accumulator;
             }
         }
@@ -124,7 +122,7 @@ namespace BetterFishing
                 }
                 else
                 {
-                    Debug.LogError("null fish in FishCatchPatch");
+                    logger.LogError("null fish in FishCatchPatch");
                 }
             }
         }
@@ -149,7 +147,7 @@ namespace BetterFishing
                     }
                 }
                 else
-                    Debug.LogError("null fish in FishPickupPatch");
+                    logger.LogError("null fish in FishPickupPatch");
             }
         }
     }
