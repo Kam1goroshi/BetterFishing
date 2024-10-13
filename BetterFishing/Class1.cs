@@ -106,16 +106,21 @@ namespace BetterFishing
 
         /**
         * @dev This runs when the fishing line is < 0.5 and the fish is caught
+        * 
+        * Note after reading dissasembly a bit: If there is no m_pickupitem, the m_pickupitem becomes the fish itself. Otherwise it's unknown.
         */
         [HarmonyPatch(typeof(FishingFloat), nameof(FishingFloat.Catch))]
         class FishCatchPatch
         {
             static void Prefix(Fish fish, Character owner)
             {
-                //Next 2 lines follow the same logic asa the original version just in case.
-                ItemDrop itemDrop = fish ? fish.gameObject.GetComponent<ItemDrop>() : null;
-                if ((bool)fish)
+                if (fish != null)
                 {
+                    ItemDrop itemDrop = fish.gameObject.GetComponent<ItemDrop>() ;
+                    // Debug lines
+                    logger.LogDebug("ItemDrop: " + (itemDrop != null ? itemDrop.name : "---"));
+                    logger.LogDebug("Pickup item: " + (fish.m_pickupItem != null ? fish.m_pickupItem.name : "---"));
+                    //end debug
                     string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
                     float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
                     Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
@@ -134,15 +139,19 @@ namespace BetterFishing
         [HarmonyPatch(typeof(Fish), nameof(Fish.Pickup))]
         class FishPickupPatch
         {
-            static void Prefix(Fish __instance)
+            static void Prefix(Fish fish)
             {
-                ItemDrop item = __instance.GetComponent<ItemDrop>();
-                if (item != null)
+                ItemDrop itemDrop = fish.GetComponent<ItemDrop>();
+                if (itemDrop != null)
                 {
-                    if (__instance.IsHooked()) //Interract with fish by pressing "E", check that it's actually on rod and not from floor.
+                    if (fish.IsHooked()) //Interract with fish by pressing "E", check that it's actually on rod and not from floor.
                     {
+                        // Debug lines
+                        logger.LogDebug("ItemDrop: " + (itemDrop != null ? itemDrop.name : "---"));
+                        logger.LogDebug("Pickup item: " + (fish.m_pickupItem != null ? fish.m_pickupItem.name : "---"));
+                        //end debug
                         string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
-                        float exp = getExpGainOnCatch(item.m_itemData.m_quality, baitPrefabName);
+                        float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
                         Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
                     }
                 }
