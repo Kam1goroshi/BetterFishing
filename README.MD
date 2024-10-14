@@ -46,7 +46,6 @@ You can download the latest version of this mod on [github](https://github.com/K
 I am not sure if I will continue this project further. But some ideas I have:
 - Extra items like fishing bag, rod, and others
 - Disable exp from reeling without a fish hooked
-- De-level a boosted fish if the catch failed
 - Some FX when a fish level is boosted
 
 Merges are welcome if someone wants to implement something

@@ -1,6 +1,15 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.2.0] - 2023-10-14
+
+### Added
+
+- Deboosting fish level (if it has been boosted) when failing to catch
+
+### Changed
+- Some code cleanups
+
 ## [1.1.0] - 2023-10-14
 
 ### Added
