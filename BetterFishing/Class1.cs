@@ -73,7 +73,7 @@ namespace BetterFishing
             baitBonusExpMap.Add("FishingBaitMistlands", fishingBaitMistlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitAshlands", fishingBaitAshlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitDeepNorth", fishingBaitDeepNorthBonus.Value);
-
+            SetupWatcher();
             foreach(var bait in baitBonusExpMap)
             {
                 logger.LogDebug($"Added <key:{bait.Key},value:{bait.Value} in baitBonusExpMap");
@@ -86,9 +86,13 @@ namespace BetterFishing
             harmony.UnpatchSelf();
         }
 
+        /*
+         * Synced configuration for those who don't use ConfigurationManager mod
+         * https://github.com/Valheim-Modding/Wiki/wiki/Best-Practices#bepinex-configuration
+         */
         private void SetupWatcher()
         {
-            System.IO.FileSystemWatcher watcher = new FileSystemWatcher(BepInEx.Paths.ConfigPath, ConfigFileName);
+            FileSystemWatcher watcher = new FileSystemWatcher(BepInEx.Paths.ConfigPath, ConfigFileName);
             watcher.Changed += ReadConfigValues;
             watcher.Created += ReadConfigValues;
             watcher.Renamed += ReadConfigValues;
@@ -97,6 +101,10 @@ namespace BetterFishing
             watcher.EnableRaisingEvents = true;
         }
 
+        /*
+         * Synced configuration for those who don't use ConfigurationManager mod
+         * https://github.com/Valheim-Modding/Wiki/wiki/Best-Practices#bepinex-configuration
+         */
         private void ReadConfigValues(object sender, FileSystemEventArgs e)
         {
             if (!File.Exists(ConfigFileFullPath)) return;
