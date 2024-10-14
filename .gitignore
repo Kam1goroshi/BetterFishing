@@ -7,6 +7,8 @@
 *.png
 DoPrebuild.props
 /BetterFishing/Environment.props
+/BetterFishing/BetterFishing.csproj
+
 # User-specific files
 *.rsuser
 *.suo
