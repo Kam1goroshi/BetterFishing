@@ -62,17 +62,33 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>@echo off
+set PROJECT_GUID="kam1goroshi-BetterFishing"
 set ZIPFILE="$(TargetDir)BetterFishing.zip"
 set ICON_FILE="C:\Users\User\source\repos\BetterFishing\icon.png"
 set README_FILE="C:\Users\User\source\repos\BetterFishing\README.md"
 set CHANGELOG_FILE="C:\Users\User\source\repos\BetterFishing\CHANGELOG.md"
 set MANIFEST_FILE="C:\Users\User\source\repos\BetterFishing\manifest.json"
 
+set DEPLOY_FOLDER="C:\Users\User\AppData\Roaming\r2modmanPlus-local\Valheim\profiles\JewelHeim\BepInEx\plugins\%25PROJECT_GUID%25"
+
 rem Remove any existing zip file
 if exist %25ZIPFILE%25 del %25ZIPFILE%25
 
 rem Create the zip file and include the necessary files
-powershell -command "Compress-Archive -Path '$(TargetDir)BetterFishing.dll', %25ICON_FILE%25, %25README_FILE%25, %25CHANGELOG_FILE%25, %25MANIFEST_FILE%25 -DestinationPath %25ZIPFILE%25"</PostBuildEvent>
+powershell -command "Compress-Archive -Path '$(TargetDir)BetterFishing.dll', %25ICON_FILE%25, %25README_FILE%25, %25CHANGELOG_FILE%25, %25MANIFEST_FILE%25 -DestinationPath %25ZIPFILE%25"
+
+rem Create the deploy folder if it does not exist
+mkdir %25DEPLOY_FOLDER%25 2&gt;nul
+
+rem Copy the necessary files to the deploy folder
+copy "$(TargetDir)BetterFishing.dll" %25DEPLOY_FOLDER%25
+copy %25ICON_FILE%25 %25DEPLOY_FOLDER%25
+copy %25README_FILE%25 %25DEPLOY_FOLDER%25
+copy %25CHANGELOG_FILE%25 %25DEPLOY_FOLDER%25
+copy %25MANIFEST_FILE%25 %25DEPLOY_FOLDER%25
+
+echo Files have been copied to %25DEPLOY_FOLDER%25 and archived as %25ZIPFILE%25
+</PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
