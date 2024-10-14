@@ -1,8 +1,20 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.1.0] - 2023-10-14
 
-## [1.0.0] - 2023-03-05
+### Added
+
+- Starting using Jotunn Library (now it is a dependency)
+- Synced configuration with server
+- Configuration updates live with or without config watcher
+
+### Changed
+
+- Logging using bepinex instead of Debug.Logging
+- Publicized dll
+
+## [1.0.0] - 2023-10-13
 
 ### Added
 

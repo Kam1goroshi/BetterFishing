@@ -4,6 +4,8 @@ using UnityEngine;
 using BepInEx.Configuration;
 using System.Collections.Generic;
 using BepInEx.Logging;
+using Jotunn.Utils;
+using System.IO;
 
 /*
  * BetterFishing - A mod for Valheim
@@ -14,10 +16,18 @@ using BepInEx.Logging;
  */
 namespace BetterFishing
 {
-    [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "1.0.0")]
+    [BepInPlugin(GUID, readableName, version)]
     [BepInProcess("valheim.exe")]
+    [BepInDependency(Jotunn.Main.ModGuid)]
+    [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class BetterFishing : BaseUnityPlugin
     {
+        private const string GUID = "kam1goroshi.BetterFishing";
+        private const string readableName = "BetterFishing";
+        private const string version = "1.1.0";
+        private static string ConfigFileName = GUID + ".cfg";
+        private static string ConfigFileFullPath = BepInEx.Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
+
         private static readonly int maxFishLevel = 5; //might be useful in the future
         private static readonly int minFishLevel = 0; //might be useful in the future
         private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BetterFishing");
@@ -39,20 +49,21 @@ namespace BetterFishing
         private static ConfigEntry<float> fishingBoosterMaxChance;
         void Awake()
         {
-            hookExpMultiplier = Config.Bind<float>("General", "Hook_Exp_Multiplier", 2.0f, new ConfigDescription("Reeling exp with a hooked fish compared to vanilla empty reel. Vanilla/Default: 2x", new AcceptableValueRange<float>(0.0f, 5.0f)));
-            stepsForCatch = Config.Bind<float>("General", "Steps_For_Catch", 10.0f, new ConfigDescription("Catching bonus compared to vanilla empty reel. 0 gives no bonus in any case", new AcceptableValueRange<float>(0.0f, 100.0f)));
-            bonusPerFishLevel = Config.Bind<float>("General", "Bonus_Per_Fish_Level", 0.5f, new ConfigDescription("Exp bonus multiplier given for fish level. 0 for no bonus. With 1.0 a 5 star fish will give +500% exp", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitBonus = Config.Bind<float>("Fish type bonus", "Simple_Fishing_Bait_bonus", 0.0f, new ConfigDescription("Bonus exp multiplier for using the default bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitForestBonus = Config.Bind<float>("Fish type bonus", "Mossy_Fishing_Bait_bonus", 0.25f, new ConfigDescription("Bonus exp multiplier for using black forrest bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitSwampBonus = Config.Bind<float>("Fish type bonus", "Sticky_Fishing_Bait_bonus", 0.4f, new ConfigDescription("Bonus exp multiplier for using swamp bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitCaveBonus = Config.Bind<float>("Fish type bonus", "Cold_Fishing_Bait_bonus", 0.8f, new ConfigDescription("Bonus exp multiplier for using cave bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitPlainsBonus = Config.Bind<float>("Fish type bonus", "Stingy_Fishing_Bait_bonus", 0.5f, new ConfigDescription("Bonus exp multiplier for using plains bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitOceanBonus = Config.Bind<float>("Fish type bonus", "Heavy_Fishing_Bait_bonus", 1.2f, new ConfigDescription("Bonus exp multiplier for using ocean bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitMistlandsBonus = Config.Bind<float>("Fish type bonus", "Misty_Fishing_Bait_bonus", 0.75f, new ConfigDescription("Bonus exp multiplier for using mistlands bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitAshlandsBonus = Config.Bind<float>("Fish type bonus", "Hot_Fishing_Bait_bonus", 1.0f, new ConfigDescription("Bonus exp multiplier for using ashlands bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBaitDeepNorthBonus = Config.Bind<float>("Fish type bonus", "Frosty_Fishing_Bait_bonus", 1.3f, new ConfigDescription("Bonus exp multiplier for using deep north bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f)));
-            fishingBoosterStartLevel = Config.Bind<int>("Fish Level Booster", "Boosting_Starting_Level", 20, new ConfigDescription("At what level you can increase the level of fish by hooking them", new AcceptableValueRange<int>(0, 100)));
-            fishingBoosterMaxChance = Config.Bind<float>("Fish Level Booster", "Max_Boosting_Chance", 1.0f, new ConfigDescription("What is the max chance? You chances increase linearly as you level until max. 0 to turn off", new AcceptableValueRange<float>(0.0f, 1.0f)));
+            ConfigurationManagerAttributes admin_flag = new ConfigurationManagerAttributes { IsAdminOnly = true };
+            hookExpMultiplier = Config.Bind<float>("General", "Hook_Exp_Multiplier", 2.0f, new ConfigDescription("Reeling exp with a hooked fish compared to vanilla empty reel. Vanilla/Default: 2x", new AcceptableValueRange<float>(0.0f, 5.0f), admin_flag));
+            stepsForCatch = Config.Bind<float>("General", "Steps_For_Catch", 10.0f, new ConfigDescription("Catching bonus compared to vanilla empty reel. 0 gives no bonus in any case", new AcceptableValueRange<float>(0.0f, 100.0f), admin_flag));
+            bonusPerFishLevel = Config.Bind<float>("General", "Bonus_Per_Fish_Level", 0.5f, new ConfigDescription("Exp bonus multiplier given for fish level. 0 for no bonus. With 1.0 a 5 star fish will give +500% exp", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitBonus = Config.Bind<float>("Fish type bonus", "Simple_Fishing_Bait_bonus", 0.0f, new ConfigDescription("Bonus exp multiplier for using the default bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitForestBonus = Config.Bind<float>("Fish type bonus", "Mossy_Fishing_Bait_bonus", 0.25f, new ConfigDescription("Bonus exp multiplier for using black forrest bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitSwampBonus = Config.Bind<float>("Fish type bonus", "Sticky_Fishing_Bait_bonus", 0.4f, new ConfigDescription("Bonus exp multiplier for using swamp bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitCaveBonus = Config.Bind<float>("Fish type bonus", "Cold_Fishing_Bait_bonus", 0.8f, new ConfigDescription("Bonus exp multiplier for using cave bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitPlainsBonus = Config.Bind<float>("Fish type bonus", "Stingy_Fishing_Bait_bonus", 0.5f, new ConfigDescription("Bonus exp multiplier for using plains bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitOceanBonus = Config.Bind<float>("Fish type bonus", "Heavy_Fishing_Bait_bonus", 1.2f, new ConfigDescription("Bonus exp multiplier for using ocean bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitMistlandsBonus = Config.Bind<float>("Fish type bonus", "Misty_Fishing_Bait_bonus", 0.75f, new ConfigDescription("Bonus exp multiplier for using mistlands bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitAshlandsBonus = Config.Bind<float>("Fish type bonus", "Hot_Fishing_Bait_bonus", 1.0f, new ConfigDescription("Bonus exp multiplier for using ashlands bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBaitDeepNorthBonus = Config.Bind<float>("Fish type bonus", "Frosty_Fishing_Bait_bonus", 1.3f, new ConfigDescription("Bonus exp multiplier for using deep north bait. 0 for no additional bonus.", new AcceptableValueRange<float>(0.0f, 10.0f), admin_flag));
+            fishingBoosterStartLevel = Config.Bind<int>("Fish Level Booster", "Boosting_Starting_Level", 20, new ConfigDescription("At what level you can increase the level of fish by hooking them", new AcceptableValueRange<int>(0, 100), admin_flag));
+            fishingBoosterMaxChance = Config.Bind<float>("Fish Level Booster", "Max_Boosting_Chance", 1.0f, new ConfigDescription("What is the max chance? You chances increase linearly as you level until max. 0 to turn off", new AcceptableValueRange<float>(0.0f, 1.0f), admin_flag));
             baitBonusExpMap.Add("FishingBait", fishingBaitBonus.Value);
             baitBonusExpMap.Add("FishingBaitForest", fishingBaitForestBonus.Value);
             baitBonusExpMap.Add("FishingBaitSwamp", fishingBaitSwampBonus.Value);
@@ -62,7 +73,7 @@ namespace BetterFishing
             baitBonusExpMap.Add("FishingBaitMistlands", fishingBaitMistlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitAshlands", fishingBaitAshlandsBonus.Value);
             baitBonusExpMap.Add("FishingBaitDeepNorth", fishingBaitDeepNorthBonus.Value);
-
+            SetupWatcher();
             foreach(var bait in baitBonusExpMap)
             {
                 logger.LogDebug($"Added <key:{bait.Key},value:{bait.Value} in baitBonusExpMap");
@@ -73,6 +84,39 @@ namespace BetterFishing
         void OnDestroy()
         {
             harmony.UnpatchSelf();
+        }
+
+        /*
+         * Synced configuration for those who don't use ConfigurationManager mod
+         * https://github.com/Valheim-Modding/Wiki/wiki/Best-Practices#bepinex-configuration
+         */
+        private void SetupWatcher()
+        {
+            FileSystemWatcher watcher = new FileSystemWatcher(BepInEx.Paths.ConfigPath, ConfigFileName);
+            watcher.Changed += ReadConfigValues;
+            watcher.Created += ReadConfigValues;
+            watcher.Renamed += ReadConfigValues;
+            watcher.IncludeSubdirectories = true;
+            watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        /*
+         * Synced configuration for those who don't use ConfigurationManager mod
+         * https://github.com/Valheim-Modding/Wiki/wiki/Best-Practices#bepinex-configuration
+         */
+        private void ReadConfigValues(object sender, FileSystemEventArgs e)
+        {
+            if (!File.Exists(ConfigFileFullPath)) return;
+            try
+            {
+                logger.LogDebug("Attempting to reload configuration...");
+                Config.Reload();
+            }
+            catch
+            {
+                logger.LogError($"There was an issue loading {ConfigFileName}");
+            }
         }
 
         /**

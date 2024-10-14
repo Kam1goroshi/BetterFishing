@@ -1,5 +1,3 @@
-
-
 <h1 align="center">
   <br>
   <br>
@@ -29,6 +27,7 @@ This mod lets you farm exp while focusing on catching high quality fish instead
 * Exp multiplier from bait type used
 * Exp multiplier from fish grade
 * Possibility to boost the grade of a fish while hooking it (once)
+* Synced configurations with server + live update with or without configwatcher mod
 
 With this mod, you can improve your fishing skill faster by catching better fish. Additionally you could make "training ponds", where you can throw your fish and refish them to become a better fisher.
 ## How To Use
@@ -48,7 +47,7 @@ I am not sure if I will continue this project further. But some ideas I have:
 - Extra items like fishing bag, rod, and others
 - Disable exp from reeling without a fish hooked
 - De-level a boosted fish if the catch failed
-- Synced configurations
+- Some FX when a fish level is boosted
 
 Merges are welcome if someone wants to implement something
 
