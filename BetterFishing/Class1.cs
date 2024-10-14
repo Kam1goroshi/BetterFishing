@@ -4,6 +4,7 @@ using UnityEngine;
 using BepInEx.Configuration;
 using System.Collections.Generic;
 using BepInEx.Logging;
+using Jotunn.Utils;
 
 /*
  * BetterFishing - A mod for Valheim
@@ -16,6 +17,8 @@ namespace BetterFishing
 {
     [BepInPlugin("kam1goroshi.BetterFishing", "Better Fishing", "1.0.0")]
     [BepInProcess("valheim.exe")]
+    [BepInDependency(Jotunn.Main.ModGuid)]
+    [NetworkCompatibility(CompatibilityLevel.EveryoneMustHaveMod, VersionStrictness.Minor)]
     public class BetterFishing : BaseUnityPlugin
     {
         private static readonly int maxFishLevel = 5; //might be useful in the future
