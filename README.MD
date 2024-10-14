@@ -49,6 +49,7 @@ I am not sure if I will continue this project further. But some ideas I have:
 - Disable exp from reeling without a fish hooked
 - De-level a boosted fish if the catch failed
 - Synced configurations
+- Some FX when a fish level is boosted
 
 Merges are welcome if someone wants to implement something
 
