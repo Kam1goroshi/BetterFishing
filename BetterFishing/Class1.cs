@@ -25,6 +25,8 @@ namespace BetterFishing
         private const string GUID = "kam1goroshi.BetterFishing";
         private const string readableName = "BetterFishing";
         private const string version = "1.0.0";
+        private static string ConfigFileName = GUID + ".cfg";
+        private static string ConfigFileFullPath = BepInEx.Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
 
         private static readonly int maxFishLevel = 5; //might be useful in the future
         private static readonly int minFishLevel = 0; //might be useful in the future
@@ -82,6 +84,31 @@ namespace BetterFishing
         void OnDestroy()
         {
             harmony.UnpatchSelf();
+        }
+
+        private void SetupWatcher()
+        {
+            System.IO.FileSystemWatcher watcher = new FileSystemWatcher(BepInEx.Paths.ConfigPath, ConfigFileName);
+            watcher.Changed += ReadConfigValues;
+            watcher.Created += ReadConfigValues;
+            watcher.Renamed += ReadConfigValues;
+            watcher.IncludeSubdirectories = true;
+            watcher.SynchronizingObject = ThreadingHelper.SynchronizingObject;
+            watcher.EnableRaisingEvents = true;
+        }
+
+        private void ReadConfigValues(object sender, FileSystemEventArgs e)
+        {
+            if (!File.Exists(ConfigFileFullPath)) return;
+            try
+            {
+                logger.LogDebug("Attempting to reload configuration...");
+                Config.Reload();
+            }
+            catch
+            {
+                logger.LogError($"There was an issue loading {ConfigFileName}");
+            }
         }
 
         /**
