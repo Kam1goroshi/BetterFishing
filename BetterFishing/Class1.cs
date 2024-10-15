@@ -1,11 +1,11 @@
 ﻿using BepInEx;
-using HarmonyLib;
-using UnityEngine;
 using BepInEx.Configuration;
-using System.Collections.Generic;
 using BepInEx.Logging;
+using HarmonyLib;
 using Jotunn.Utils;
+using System.Collections.Generic;
 using System.IO;
+using UnityEngine;
 
 /*
  * BetterFishing - A mod for Valheim
@@ -168,12 +168,15 @@ namespace BetterFishing
         {
             static void Postfix(Fish __instance, FishingFloat ff)
             {
+                ItemDrop item = __instance.m_itemDrop;
+                if (item == null || item.m_itemData == null)
+                {
+                    logger.LogError("Called boost patch on fish that had no itemDrop on it");
+                    return;
+                }
                 //boost
                 if (ff != null)
                 {
-                    ItemDrop item = __instance.m_itemDrop;
-                    if (item != null && item.m_itemData != null)
-                    {
                         //If fish is was dropped (caught by player), do nothing
                         //This is saddly necessary due to issues with stacks.
                         //Boosting was working with dropped fish too before (that were not boosted), but it has to go
@@ -210,7 +213,6 @@ namespace BetterFishing
                                 item.Save();
                             }
                         }
-                    }
                 }
                 else
                 {
