@@ -206,13 +206,13 @@ namespace BetterFishing
                             {
                                 //run rng before this
                                 item.SetQuality(Mathf.Clamp(item.m_itemData.m_quality + 1, minFishLevel, maxFishLevel));
-                                item.Save();
                                 counter++;
                             }
                             if (counter > 0)
                             {
                                 ff.GetOwner().Message(MessageHud.MessageType.Center, $"Fish Level raised by {counter}!");
                                 item.m_itemData.m_customData.Add(boostedByFishingLevelKey, $"{counter}");
+                                item.Save();
                             }
                         }
                     }
