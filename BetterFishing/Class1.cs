@@ -201,7 +201,7 @@ namespace BetterFishing
                             //Run RNG, on success attempt to level up fish
                             int counter = 0; //using counter due to multiple rolls consideration in the future
                             float rng = UnityEngine.Random.Range(0.0f, 1.0f);
-                            logger.LogMessage($"Boosting success rate: {successRate:F2}% and rolled {rng:F2}%");
+                            logger.LogMessage($"Boosting success rate: {(successRate*100):f2}% and rolled {(rng*100):F2}%");
                             if (successRate > rng)
                             {
                                 //run rng before this
