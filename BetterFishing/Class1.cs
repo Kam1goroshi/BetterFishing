@@ -179,8 +179,8 @@ namespace BetterFishing
                 //Boosting was working with dropped fish too before (that were not boosted), but it has to go
                 //Check if fish has been caught before
                 if (item.m_itemData.m_customData.ContainsKey(caughtFlagKey))
-                {
-                    logger.LogMessage("Fish had been caught before. Aborting boost attempt");
+                {   
+                    logger.LogMessage("Fish has been marked as caught. Won't boost attempt");
                     return;
                 }
                 //boost
