@@ -145,21 +145,6 @@ namespace BetterFishing
             }
         }
 
-        [HarmonyPatch(typeof(ItemDrop), nameof(ItemDrop.DropItem))]
-        class testPatch
-        {
-            static void Prefix(ItemDrop.ItemData item, int amount, Vector3 position, Quaternion rotation)
-            {
-                logger.LogMessage($"Item of type {item.m_shared.m_itemType} was dropped");
-                if (item.m_customData.ContainsKey(caughtFlagKey))
-                {
-                    item.m_customData.Remove(caughtFlagKey);
-                    //save is not needed because the method will conveniently call it by itself on the component that will get these itemData. 
-                    logger.LogMessage($"removed 'caught' flag from {item.m_shared.m_name}");
-                }
-            }
-        }
-
         /**
          *  Patch that initializes things in Fishing Awake 
          */
@@ -184,6 +169,15 @@ namespace BetterFishing
             static void Postfix(Fish __instance, FishingFloat ff)
             {
                 ItemDrop item = __instance.m_itemDrop;
+                //If fish is was dropped (caught by player), do nothing
+                //This is saddly necessary due to issues with stacks.
+                //Boosting was working with dropped fish too before (that were not boosted), but it has to go
+                //Check if fish has been caught before
+                if (item.m_itemData.m_customData.ContainsKey(caughtFlagKey))
+                {
+                    logger.LogMessage("Fish had been caught before. Aborting boost attempt");
+                    return;
+                }
                 //boost
                 if (ff != null)
                 {
@@ -225,16 +219,12 @@ namespace BetterFishing
                         //Check if the fish is boosted
                         if (item.m_itemData.m_customData.TryGetValue(boostedByFishingLevelKey, out string value))
                         {
-                            //Check if fish has been caught before
-                            if (!item.m_itemData.m_customData.ContainsKey(caughtFlagKey))
-                            {
-                                logger.LogMessage("In OnHooked(null) with fish that was not already caught");
-                                int levelsBoosted = int.Parse(value);
-                                item.SetQuality(Mathf.Clamp(item.m_itemData.m_quality - levelsBoosted, minFishLevel, maxFishLevel));
-                                item.m_itemData.m_customData.Remove(boostedByFishingLevelKey); //in the future instead of removing, decrement
-                                item.Save();
-                                Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"Failed to catch, fish level unboosted..");
-                            }
+                            logger.LogMessage("In OnHooked(null) with fish that was not already caught");
+                            int levelsBoosted = int.Parse(value);
+                            item.SetQuality(Mathf.Clamp(item.m_itemData.m_quality - levelsBoosted, minFishLevel, maxFishLevel));
+                            item.m_itemData.m_customData.Remove(boostedByFishingLevelKey); //in the future instead of removing, decrement
+                            item.Save();
+                            Player.m_localPlayer.Message(MessageHud.MessageType.Center, $"Failed to catch, fish level unboosted..");
                         }
                     }
                 }
