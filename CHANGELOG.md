@@ -1,6 +1,18 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.2.1] - 2023-10-15
+### Changed
+
+- Fixxed issues with stacked fish in inventory losing their attributes by removing the ability to boost fish after they've been picked up
+- Fixxed a bug where fish would lose their attributes due to saving before assigning them
+
+### Removed
+- No longer able to boost fish that were already picked up
+
+### Notes
+- Some of these issues could be fixxed by making each fish unstuckable but I believe the annoyance with inventory slots would not be worth it for most players.
+
 ## [1.2.0] - 2023-10-14
 
 ### Added

@@ -24,7 +24,7 @@ namespace BetterFishing
     {
         private const string GUID = "kam1goroshi.BetterFishing";
         private const string readableName = "BetterFishing";
-        private const string version = "1.2.0";
+        private const string version = "1.2.1";
         private static string ConfigFileName = GUID + ".cfg";
         private static string ConfigFileFullPath = BepInEx.Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
 
