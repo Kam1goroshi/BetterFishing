@@ -168,21 +168,22 @@ namespace BetterFishing
         {
             static void Postfix(Fish __instance, FishingFloat ff)
             {
-                ItemDrop item = __instance.m_itemDrop;
-                //If fish is was dropped (caught by player), do nothing
-                //This is saddly necessary due to issues with stacks.
-                //Boosting was working with dropped fish too before (that were not boosted), but it has to go
-                //Check if fish has been caught before
-                if (item.m_itemData.m_customData.ContainsKey(caughtFlagKey))
-                {
-                    logger.LogMessage("Fish had been caught before. Aborting boost attempt");
-                    return;
-                }
                 //boost
                 if (ff != null)
                 {
-                    if (item != null && __instance.m_itemDrop.m_itemData != null)
+                    ItemDrop item = __instance.m_itemDrop;
+                    if (item != null && item.m_itemData != null)
                     {
+                        //If fish is was dropped (caught by player), do nothing
+                        //This is saddly necessary due to issues with stacks.
+                        //Boosting was working with dropped fish too before (that were not boosted), but it has to go
+                        //Check if fish has been caught before
+                        if (item.m_itemData.m_customData.ContainsKey(caughtFlagKey))
+                        {
+                            logger.LogMessage("Fish had been caught before. Aborting boost attempt");
+                            return;
+                        }
+
                         float fishingLevel = Player.m_localPlayer.GetSkillLevel(Skills.SkillType.Fishing);
                         //Check that the fish is not boosted and that fishing skill is strong enough to boost fish levels
                         if (fishingLevel >= fishingBoosterStartLevel.Value &&
