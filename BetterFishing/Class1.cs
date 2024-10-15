@@ -174,21 +174,19 @@ namespace BetterFishing
                     logger.LogError("Called boost patch on fish that had no itemDrop on it");
                     return;
                 }
+                //If fish is was dropped (caught by player), do nothing
+                //This is saddly necessary due to issues with stacks.
+                //Boosting was working with dropped fish too before (that were not boosted), but it has to go
+                //Check if fish has been caught before
+                if (item.m_itemData.m_customData.ContainsKey(caughtFlagKey))
+                {
+                    logger.LogMessage("Fish had been caught before. Aborting boost attempt");
+                    return;
+                }
                 //boost
                 if (ff != null)
                 {
-                    //If fish is was dropped (caught by player), do nothing
-                    //This is saddly necessary due to issues with stacks.
-                    //Boosting was working with dropped fish too before (that were not boosted), but it has to go
-                    //Check if fish has been caught before
-                    if (item.m_itemData.m_customData.ContainsKey(caughtFlagKey))
-                    {
-                        logger.LogMessage("Fish had been caught before. Aborting boost attempt");
-                        return;
-                    }
-
                     float fishingLevel = Player.m_localPlayer.GetSkillLevel(Skills.SkillType.Fishing);
-                    //Check that the fish is not boosted and that fishing skill is strong enough to boost fish levels
                     //Check that the fish is not boosted and that fishing skill is strong enough to boost fish levels
                     if (fishingLevel >= fishingBoosterStartLevel.Value &&
                             item.m_itemData.m_customData.ContainsKey(boostedByFishingLevelKey) == false)
@@ -246,10 +244,10 @@ namespace BetterFishing
                 {
                     ItemDrop itemDrop = fish.gameObject.GetComponent<ItemDrop>();
 
-#if DEBUG
+                    #if DEBUG
                     logger.LogDebug("ItemDrop: " + (itemDrop != null ? itemDrop.name : "---"));
                     logger.LogDebug("Pickup item: " + (fish.m_pickupItem != null ? fish.m_pickupItem.name : "---"));
-#endif
+                    #endif
                     string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
                     float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
                     Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
@@ -280,10 +278,10 @@ namespace BetterFishing
                 {
                     if (__instance.IsHooked()) //Interract with fish by pressing "E", check that it's actually on rod and not from floor.
                     {
-#if DEBUG
+                        #if DEBUG
                         logger.LogDebug("ItemDrop: " + (itemDrop != null ? itemDrop.name : "---"));
                         logger.LogDebug("Pickup item: " + (__instance.m_pickupItem != null ? __instance.m_pickupItem.name : "---"));
-#endif
+                        #endif
                         string baitPrefabName = Player.m_localPlayer.GetAmmoItem().m_dropPrefab.name;
                         float exp = getExpGainOnCatch(itemDrop.m_itemData.m_quality, baitPrefabName);
                         Player.m_localPlayer.RaiseSkill(Skills.SkillType.Fishing, exp);
