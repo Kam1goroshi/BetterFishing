@@ -189,6 +189,7 @@ namespace BetterFishing
 
                         float fishingLevel = Player.m_localPlayer.GetSkillLevel(Skills.SkillType.Fishing);
                         //Check that the fish is not boosted and that fishing skill is strong enough to boost fish levels
+                        //Check that the fish is not boosted and that fishing skill is strong enough to boost fish levels
                         if (fishingLevel >= fishingBoosterStartLevel.Value &&
                                 item.m_itemData.m_customData.ContainsKey(boostedByFishingLevelKey) == false)
                         {
