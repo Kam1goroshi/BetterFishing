@@ -1,6 +1,11 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+## [1.2.2] - 2023-10-16
+
+### Added
+- small fx when fish level gets boosted
+
 ## [1.2.1] - 2023-10-15
 ### Changed
 

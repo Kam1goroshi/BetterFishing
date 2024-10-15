@@ -24,10 +24,11 @@ namespace BetterFishing
     {
         private const string GUID = "kam1goroshi.BetterFishing";
         private const string readableName = "BetterFishing";
-        private const string version = "1.2.1";
+        private const string version = "1.2.2";
+        private static AssetBundle myAssetBundle;
         private static string ConfigFileName = GUID + ".cfg";
-        private static string ConfigFileFullPath = BepInEx.Paths.ConfigPath + Path.DirectorySeparatorChar + ConfigFileName;
-
+        private static string configFilePath = BepInEx.Paths.ConfigPath;
+        private static string ConfigFileFullPath = configFilePath + Path.DirectorySeparatorChar + ConfigFileName;
         private static readonly int maxFishLevel = 5; //might be useful in the future
         private static readonly int minFishLevel = 1; //might be useful in the future
         private static ManualLogSource logger = BepInEx.Logging.Logger.CreateLogSource("BetterFishing");
@@ -53,6 +54,7 @@ namespace BetterFishing
 
         void Awake()
         {
+            myAssetBundle = AssetUtils.LoadAssetBundleFromResources("kam_bundle", typeof(BetterFishing).Assembly);
             ConfigurationManagerAttributes admin_flag = new ConfigurationManagerAttributes { IsAdminOnly = true };
             hookExpMultiplier = Config.Bind<float>("General", "Hook_Exp_Multiplier", 2.0f, new ConfigDescription("Reeling exp with a hooked fish compared to vanilla empty reel. Vanilla/Default: 2x", new AcceptableValueRange<float>(0.0f, 5.0f), admin_flag));
             stepsForCatch = Config.Bind<float>("General", "Steps_For_Catch", 10.0f, new ConfigDescription("Catching bonus compared to vanilla empty reel. 0 gives no bonus in any case", new AcceptableValueRange<float>(0.0f, 100.0f), admin_flag));
@@ -209,6 +211,8 @@ namespace BetterFishing
                         {
                             ff.GetOwner().Message(MessageHud.MessageType.Center, $"Fish Level raised by {counter}!");
                             item.m_itemData.m_customData.Add(boostedByFishingLevelKey, $"{counter}");
+                            GameObject levelUpEffect = myAssetBundle.LoadAsset<GameObject>("kam_LevelUpEffect");
+                            Instantiate(levelUpEffect, __instance.transform.position, __instance.transform.rotation);
                             item.Save();
                         }
                     }

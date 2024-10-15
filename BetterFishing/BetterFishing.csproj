@@ -53,6 +53,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="kam_bundle" />
     <None Include="manifest.json" />
     <None Include="packages.config" />
   </ItemGroup>
