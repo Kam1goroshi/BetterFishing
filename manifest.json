@@ -4,5 +4,5 @@
     "author": "Kam1goroshi",
     "website_url": "https://github.com/Kam1goroshi/BetterFishing",
     "description": "A Mod aiming to improve fishing experience in Valheim.",
-    "dependencies": ["ValheimModding-Jotunn-2.20.3"]
+    "dependencies": ["ValheimModding-Jotunn-2.22.0"]
 }

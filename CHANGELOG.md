@@ -1,12 +1,18 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-## [1.2.2] - 2023-10-16
+## [1.2.3] - 2024-12-8
+
+## Changed 
+- Updated BepInEx.dll to v5.4.22
+- Updated JotunnLib and dependencies to v2.22.0
+
+## [1.2.2] - 2024-10-16
 
 ### Added
 - small fx when fish level gets boosted
 
-## [1.2.1] - 2023-10-15
+## [1.2.1] - 2024-10-15
 ### Changed
 
 - Fixxed issues with stacked fish in inventory losing their attributes by removing the ability to boost fish after they've been picked up
@@ -18,7 +24,7 @@ All notable changes to this project will be documented in this file.
 ### Notes
 - Some of these issues could be fixxed by making each fish unstuckable but I believe the annoyance with inventory slots would not be worth it for most players.
 
-## [1.2.0] - 2023-10-14
+## [1.2.0] - 2024-10-14
 
 ### Added
 
@@ -27,7 +33,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - Some code cleanups
 
-## [1.1.0] - 2023-10-14
+## [1.1.0] - 2024-10-14
 
 ### Added
 
@@ -40,7 +46,7 @@ All notable changes to this project will be documented in this file.
 - Logging using bepinex instead of Debug.Logging
 - Publicized dll
 
-## [1.0.0] - 2023-10-13
+## [1.0.0] - 2024-10-13
 
 ### Added
 
